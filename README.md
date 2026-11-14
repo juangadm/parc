@@ -45,4 +45,6 @@ The engine lives in `src`. `npm run build` writes `dist`, which is checked in so
 
 ## Credits
 
-After Julio Le Parc. The guide's layout follows [heerich.js](https://meodai.github.io/heerich/) by David Aerne. The paintings in the guide were measured from photographs at The Metropolitan Museum of Art.
+The engine and its guide are inspired by [heerich.js](https://meodai.github.io/heerich/), David Aerne's voxel engine.
+
+The art is inspired by Julio Le Parc. I've loved his motion studies since I saw [*Julio Le Parc 1959*](https://www.metmuseum.org/exhibitions/listings/2018/julio-le-parc-1959) at the Met.
