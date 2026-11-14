@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>parc — Interactive Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<div class="hero" id="hero" title="Hover to move it. Tap for a new one. Space plays."></div>
+
+<details class="settings-panel" id="settings" open>
+  <summary class="settings-title">Settings <span class="details-icon">▸</span></summary>
+  <div class="settings-section-title">Progress <button id="rand-progress" title="Shuffle the progress">⇋</button></div>
+  <div class="settings-fields">
+    <label class="control-label">Progress<div class="range-wrap"><input type="range" id="set-progress" min="0" max="1" step="0.01" value="0"><span class="range-thumb"></span><span class="range-cap-left"></span><span class="range-cap-right"></span></div><span class="control-value" id="v-progress">0</span></label>
+    <label class="control-label">Stagger<div class="range-wrap"><input type="range" id="set-stagger" min="0" max="2" step="0.05" value="1"><span class="range-thumb"></span><span class="range-cap-left"></span><span class="range-cap-right"></span></div><span class="control-value" id="v-stagger">1</span></label>
+    <button class="play-button" id="play">Play</button>
+    <details class="playing"><summary>Playing <span class="details-icon">▸</span></summary>
+    <label class="control-label">Duration<div class="range-wrap"><input type="range" id="set-duration" min="1" max="10" step="0.5" value="4"><span class="range-thumb"></span><span class="range-cap-left"></span><span class="range-cap-right"></span></div><span class="control-value" id="v-duration">4s</span></label>
+    <label class="control-label">After a cycle<select class="control-select" id="set-repeat"><option value="reverse">come back</option><option value="loop">start again</option></select></label>
+    <label class="control-label">Easing<select class="control-select" id="set-easing"><option>ease in out, sine</option><option>linear</option><option>ease in out</option><option>ease in out, strong</option></select></label>
+    </details>
+  </div>
+  <div class="settings-section-title">Density <button id="rand-density" title="Shuffle the density">⇋</button></div>
+  <div class="settings-fields">
+    <label class="control-label">Cells<div class="range-wrap"><input type="range" id="set-density" min="0.5" max="2" step="0.25" value="1"><span class="range-thumb"></span><span class="range-cap-left"></span><span class="range-cap-right"></span></div><span class="control-value" id="v-density">×1</span></label>
+  </div>
+  <div class="settings-section-title">Color <button id="rand-color" title="Shuffle the color">⇋</button></div>
+  <div class="settings-fields">
+    <label class="control-label">Palette<select class="control-select" id="set-palette"></select></label>
+  </div>
+  <div class="settings-section-title">Finish <button id="rand-finish" title="Shuffle the finish">⇋</button></div>
+  <div class="settings-fields">
+    <label class="control-label">Wobble<div class="range-wrap"><input type="range" id="set-wobble" min="0" max="1.5" step="0.05" value="0"><span class="range-thumb"></span><span class="range-cap-left"></span><span class="range-cap-right"></span></div><span class="control-value" id="v-wobble">0</span></label>
+    <label class="control-label">Grid lines <input type="checkbox" id="set-gridlines"></label>
+    <label class="control-label">Cell background <input type="checkbox" id="set-cards"></label>
+  </div>
+  <div class="settings-section-title">Stroke <button id="rand-stroke" title="Shuffle the stroke">⇋</button></div>
+  <div class="settings-fields">
+    <label class="control-label">Stroke<div class="range-wrap"><input type="range" id="set-stroke" min="0" max="0.06" step="0.005" value="0"><span class="range-thumb"></span><span class="range-cap-left"></span><span class="range-cap-right"></span></div><span class="control-value" id="v-stroke">solid</span></label>
+  </div>
+  <button class="reset-button" id="reset">Back to the paintings</button>
+</details>
+
+<article>
+  <div class="intro">
+    <h1>parc <span class="version">0.2.0</span><small>A small engine for sequences, rendered to SVG</small></h1>
+    <div class="intro-text">
+      <p>parc repeats one shape and changes it a step at a time. Each cell is one step of the same change, so every picture is also an animation. Press play and it moves.</p>
+      <p>It draws plain SVG. No dependencies, about 12 KB. Get it on <a href="https://github.com/juangadm/parc">GitHub</a>.</p>
+      <p>The look comes from the motion studies <a href="https://www.metmuseum.org/exhibitions/listings/2018/julio-le-parc-1959">Julio Le Parc</a> painted in 1958 and 1959.</p>
+      <p>Hover the picture at the top, or tap it. The settings on the right change every picture on the page.</p>
+    </div>
+    <nav><ol id="toc"></ol></nav>
+  </div>
+  <div id="sections"></div>
+
+  <div class="section-full" id="combined"><h2>Putting it all together</h2>
+    <p>A random mix of everything above. Hover to move it. Click for another.</p></div>
+  <div class="combined-canvas" id="demo-combined"></div>
+  <pre class="combined-code"><code id="code-combined"></code></pre>
+
+  <div class="section-full" id="sequences"><h2>Sequences</h2>
+    <p>Eight pictures made only with parc. Hover one to play it. Tap to send a ripple.</p></div>
+  <div class="gallery" id="sequence-tiles"></div>
+
+  <div class="section-full" id="after"><h2>After Le Parc</h2>
+    <p>Fifteen of Le Parc's studies from 1958 and 1959, rebuilt with parc from the Met's photographs. Fourteen taught the engine something. The last, Rotations, was the test: built with the engine as it was.</p></div>
+  <div class="gallery" id="gallery"></div>
+
+  <footer class="site-footer">
+    <p>parc, after Julio Le Parc. <a href="https://github.com/juangadm/parc">GitHub</a>. Page after <a href="https://meodai.github.io/heerich/">heerich.js</a> by David Aerne. Measured from photographs at The Metropolitan Museum of Art.</p>
+  </footer>
+</article>
+
+<script type="module">
+  import { toSVG, render, cellAt, play } from "./dist/index.js";
+  import { learning } from "./studies/learning.js";
+  import { FOURTEEN, PALETTES, finish, SEQUENCES } from "./studies/originals.js";
+
+  const $ = (id) => document.getElementById(id);
+
+  for (const name of Object.keys(PALETTES)) $("set-palette").add(new Option(name, name));
+
+  // ---- the sections: one engine capability each, every sequence original ----
+  // controls: [id, label, min, max, step, value] for sliders, or [id, label, [options]] for selects
+  // Each section shows one idea. Every slider changes exactly the word in the code it is named after.
+  // A rule written out with its numbers, so the code panel shows the formula as it is, not a variable.
+  const ruleOf = (src) => new Function(`return ${src}`)();
+  const star = Array.from({ length: 10 }, (_, i) => { const a = -Math.PI / 2 + (i * Math.PI) / 5, r = i % 2 ? 0.2 : 0.5; return [Math.round(r * Math.cos(a) * 100) / 100, Math.round(r * Math.sin(a) * 100) / 100]; });
+  // two bars crossing in each cell: an upright one in ink and a flat one in the accent color
+  const woven = (c) => ({ kind: "group", pieces: [{ shape: { kind: "rectangle", color: c.ink, width: 0.1, height: 0.72 } }, { shape: { kind: "rectangle", color: c.accent, width: 0.72, height: 0.1 } }] });
+  let drawn = [[0, -0.42], [0.4, 0.34], [-0.4, 0.34]];
+  const OUTLINES = {
+    bracket: [[-0.5, -0.5], [0.5, -0.5], [0.5, -0.25], [-0.25, -0.25], [-0.25, 0.5], [-0.5, 0.5]],
+    arrow: [[-0.5, -0.15], [0.1, -0.15], [0.1, -0.45], [0.5, 0], [0.1, 0.45], [0.1, 0.15], [-0.5, 0.15]],
+    star,
+  };
+  const SECTIONS = [
+    { id: "sequence", title: "Making a sequence", canvas: "wide",
+      text: "A sequence is one shape, a layout and the changes that run across its cells. <code>toSVG</code> turns it into SVG.",
+      code: (v) => `npm install github:juangadm/parc\n\nimport { toSVG } from "parc";\n\n${call("toSVG", { shape: { kind: "square" }, layout: { kind: "row", count: v.cells }, changes: [{ property: "angle", to: v.turn }] })}`,
+      controls: [["cells", "Cells", 3, 15, 1, 7], ["turn", "Turn", 0, 180, 5, 90]],
+      sequence: (v, c) => ({ shape: { kind: "square", color: c.ink, width: 0.5 }, layout: { kind: "row", count: v.cells, margin: 0.4 },
+        changes: [{ property: "angle", from: 0, to: v.turn }] }) },
+    { id: "time", title: "Time", canvas: "stack",
+      text: "Each cell is a step ahead of the last. Paused, you see every step at once. Press play.",
+      code: (v, st) => ({ time: { duration: st.time.duration, stagger: st.time.stagger } }),
+      controls: [["scrub", "Scrub", 0, 1, 0.005, 0]],
+      sequence: (v, c) => ({ shape: { kind: "square", color: c.ink, width: 0.5 }, layout: { kind: "row", count: 11, margin: 0.4 },
+        changes: [{ property: "angle", from: 0, to: 90 }] }) },
+    { id: "shapes", title: "Shapes",
+      text: "Pick a shape, or draw your own: click to add a corner, drag to move one, double-click to remove it. The change stays the same.",
+      code: (v, st) => ({ shape: st.shape.points ? { kind: "outline", points: [...st.shape.points.slice(0, 2), raw("…")] } : { kind: v.kind, width: v.size } }),
+      controls: [["kind", "Shape", ["split-square", "triangle", "cut-circle", "crescent", "ring", "polygon", "pie", "cross", "diamond", "segments", "bar", "square", "star", "arrow", "bracket", "draw your own"]], ["size", "Size", 0.3, 0.95, 0.05, 0.7]],
+      sequence: (v, c) => {
+        const own = v.kind === "draw your own" ? drawn : OUTLINES[v.kind];
+        const extra = own ? { kind: "outline", points: own } : { "split-square": { colors: [c.ink, c.accent] }, "cut-circle": { amount: 0.78 }, pie: { amount: 0.3 }, cross: { height: 0.08 },
+          segments: { colors: [c.ink, c.accent, c.second], count: 3 }, bar: { height: Math.round(v.size * 40) / 100 },
+          crescent: { amount: 0.55 }, ring: { amount: 0.35 }, polygon: { sides: 5 } }[v.kind] ?? {};
+        return { shape: { kind: v.kind, color: c.ink, width: v.size, ...extra }, layout: { kind: "grid", columns: 6, rows: 6, margin: 0.4 },
+          changes: [{ property: "angle", from: 0, to: 180, order: "diagonally" }] }; } },
+    { id: "splits", title: "Splits",
+      text: "<code>split</code> cuts any shape in two colors. <code>gap</code> leaves background between them.",
+      code: (v, st) => ({ shape: { kind: st.shape.kind, gap: v.gap }, changes: [{ property: "split", from: v.from, to: v.to }] }),
+      controls: [["kind", "Shape", ["circle", "triangle", "square", "diamond", "hexagon", "star", "crescent"]], ["from", "Split, first cell", 0, 1, 0.05, 0.1], ["to", "Split, last cell", 0, 1, 0.05, 0.9], ["gap", "Gap", 0, 0.2, 0.01, 0.04]],
+      sequence: (v, c) => {
+        const kind = { hexagon: { kind: "polygon", sides: 6 }, star: { kind: "outline", points: OUTLINES.star } }[v.kind] ?? { kind: v.kind };
+        return { shape: { ...kind, colors: [c.ink, c.accent], width: 0.8, gap: v.gap }, layout: { kind: "grid", columns: 7, rows: 7, margin: 0.4 },
+          changes: [{ property: "split", from: v.from, to: v.to, order: "diagonally" }] }; } },
+    { id: "count", title: "Count",
+      text: "<code>count</code> shows an amount as small squares, up one column and down the next.",
+      code: (v) => ({ shape: { kind: "count", count: v.side }, changes: [{ property: "amount", to: 1 }] }),
+      controls: [["side", "Squares a side", 2, 5, 1, 4]],
+      sequence: (v, c) => ({ shape: { kind: "count", color: c.ink, width: 0.9, count: v.side }, layout: { kind: "grid", columns: 7, rows: 7, margin: 0.4, gridLines: true },
+        changes: [{ property: "amount", from: 0, to: 1, order: "diagonally" }] }) },
+    { id: "pieces", title: "Pieces",
+      text: "A shape can be made of pieces, and <code>piece</code> aims a change at one of them. One bar grows across the columns, the other down the rows. Every crossing is different.",
+      code: (v) => ({ shape: { kind: "group", pieces: raw("[upright, flat]") }, changes: [{ property: "width", piece: 0, to: v.widest }, { property: "height", piece: 1, to: v.widest, order: "top to bottom" }] }),
+      controls: [["cells", "Cells", 4, 14, 1, 9], ["widest", "Widest", 0.2, 0.7, 0.05, 0.45]],
+      sequence: (v, c) => ({ shape: woven(c), layout: { kind: "grid", columns: v.cells, rows: v.cells, margin: 0.4 },
+        changes: [{ property: "width", piece: 0, from: 0.04, to: v.widest }, { property: "height", piece: 1, from: 0.04, to: v.widest, order: "top to bottom" }] }) },
+    { id: "align", title: "Align", canvas: "wide",
+      text: "<code>align</code> pins a shape to an edge or a corner. It grows from there.",
+      code: (v) => ({ shape: { kind: "bar", align: v.align }, changes: [{ property: "height", from: 0.1, to: 0.9 }] }),
+      controls: [["align", "Align", ["bottom", "center", "top", "bottom left"]], ["cells", "Cells", 5, 15, 1, 9]],
+      sequence: (v, c) => ({ shape: { kind: "bar", color: c.ink, width: 0.25, height: 0.1, align: v.align }, layout: { kind: "row", count: v.cells, margin: 0.4, gap: 0.08, cellBackground: "var(--code-bg)", aspect: 2.5 },
+        changes: [{ property: "height", from: 0.1, to: 0.9 }] }) },
+    { id: "grids", title: "Grids",
+      text: "Cells sit in a row or a grid. Each column and row can have its own size.",
+      code: (v, st) => ({ layout: { kind: "grid", columnSizes: [...st.layout.columnSizes.slice(0, 2), raw("…")], rowSizes: [...st.layout.rowSizes.slice(0, 2), raw("…")] } }),
+      controls: [["cols", "Columns", 3, 17, 1, 11], ["squeeze", "Edge to middle", 1, 5, 0.25, 3]],
+      sequence: (v, c) => { const mid = (v.cols - 1) / 2;
+        const sizes = Array.from({ length: v.cols }, (_, k) => Math.round(v.squeeze ** (mid ? Math.abs(k - mid) / mid : 0) * 100) / 100);
+        return { shape: { kind: "square", color: c.ink, width: 0.72 }, layout: { kind: "grid", columnSizes: sizes, rowSizes: sizes, margin: 0.4 }, changes: [] }; } },
+    { id: "rings", title: "Rings",
+      text: "Or around a circle. With <code>facing</code>, each cell points out.",
+      code: (v) => ({ layout: { kind: "ring", count: v.cells, facing: v.facing === "yes" } }),
+      controls: [["cells", "Cells", 6, 36, 1, 16], ["facing", "Face out", ["yes", "no"]]],
+      sequence: (v, c) => ({ shape: { kind: "bar", color: c.ink, width: 0.18, height: 0.6 }, layout: { kind: "ring", count: v.cells, margin: 0.4, facing: v.facing === "yes" },
+        changes: [{ property: "angle", from: 0, to: 180 }] }) },
+    { id: "layers", title: "Layers",
+      text: "Stack sequences on the same background and the same clock. Two grids make a pattern neither has alone.",
+      code: (v) => ({ layers: [{ shape: { kind: "cross" }, layout: { kind: "grid", columns: v.cols }, changes: [{ property: "angle", to: v.turn }] }] }),
+      controls: [["turn", "Top turns", 0, 180, 5, 90], ["cols", "Top cells", 4, 16, 1, 8]],
+      sequence: (v, c) => ({ shape: { kind: "split-circle", colors: [c.ink, c.second], width: 0.8 }, layout: { kind: "grid", columns: 8, rows: 8, margin: 0.4 },
+        changes: [{ property: "amount", from: 0.2, to: 0.8, order: "diagonally" }],
+        layers: [{ shape: { kind: "cross", color: c.accent, width: 0.9, height: 0.06 }, layout: { kind: "grid", columns: v.cols, rows: v.cols, margin: 0.4 },
+          changes: [{ property: "angle", from: 0, to: v.turn, order: "from center" }] }] }) },
+    { id: "order", title: "Order",
+      text: "<code>order</code> sets the order the cells go through a change.",
+      code: (v) => ({ changes: [{ property: "angle", to: v.turn, order: v.order }] }),
+      controls: [["order", "Order", ["in rings", "from center", "diagonally", "left to right", "from middle column", "checkerboard", "random"]], ["turn", "Turn", 0, 180, 5, 90]],
+      sequence: (v, c) => ({ shape: { kind: "cross", color: c.ink, width: 0.7, height: 0.07 }, layout: { kind: "grid", columns: 9, rows: 9, margin: 0.4 },
+        changes: [{ property: "angle", from: 0, to: v.turn, order: v.order }] }) },
+    { id: "patterns", title: "Patterns", canvas: "wide",
+      text: "<code>pattern</code> sets the rhythm: one way, there and back, a loop, or steps. <code>peak</code> moves where it turns back.",
+      code: (v) => ({ changes: [{ property: "height", to: 0.9, pattern: v.pattern, peak: v.pattern === "there and back" ? v.peak : undefined, steps: v.pattern === "steps" ? 4 : undefined, repeat: v.repeat > 1 ? v.repeat : undefined }] }),
+      controls: [["pattern", "Pattern", ["there and back", "one way", "loop", "steps"]], ["peak", "Peak", 0.05, 0.95, 0.05, 0.3], ["repeat", "Repeat", 1, 4, 1, 1]],
+      sequence: (v, c) => ({ shape: { kind: "bar", color: c.ink, width: 0.5, height: 0.05, align: "bottom" }, layout: { kind: "row", count: 21, margin: 0.4, aspect: 3 },
+        changes: [{ property: "height", from: 0.05, to: 0.9, pattern: v.pattern, ...(v.pattern === "there and back" ? { peak: v.peak } : {}), ...(v.pattern === "steps" ? { steps: 4 } : {}), repeat: v.repeat }] }) },
+    { id: "easing", title: "Easing", canvas: "wide",
+      text: "<code>easing</code> sets where a change speeds up and where it slows down. The bars draw the curve.",
+      code: (v) => ({ changes: [{ property: "height", from: 0.05, to: 0.95, easing: v.easing }] }),
+      controls: [["easing", "Easing", ["ease in out, sine", "linear", "ease in", "ease out", "ease in, sine", "ease out, sine", "ease in out, strong"]], ["cells", "Cells", 5, 25, 1, 15]],
+      sequence: (v, c) => ({ shape: { kind: "bar", color: c.ink, width: 0.5, height: 0.05, align: "bottom" }, layout: { kind: "row", count: v.cells, margin: 0.4, aspect: 3 },
+        changes: [{ property: "height", from: 0.05, to: 0.95, easing: v.easing }] }) },
+    { id: "pivot", title: "Pivot",
+      text: "<code>pivot</code> sets what a shape turns around: its center, its corner like a rolling box, or a point next to it.",
+      code: (v) => (v.around === "a point beside it" ? { pieces: [{ shape: { kind: "dot" }, x: 0.22, around: [0, 0] }] } : { changes: [{ property: "angle", to: v.turn, pivot: v.around === "its corner" ? "roll" : undefined }] }),
+      controls: [["around", "Pivot", ["a point beside it", "its center", "its corner"]], ["turn", "Turn", 0, 360, 15, 360]],
+      sequence: (v, c) => {
+        if (v.around === "a point beside it") return { shape: { kind: "group", pieces: [{ shape: { kind: "dot", color: c.ink, width: 0.3 }, x: 0.22, y: 0, around: [0, 0] }, { shape: { kind: "dot", color: c.accent, width: 0.07 } }] },
+          layout: { kind: "grid", columns: 6, rows: 6, margin: 0.4 }, changes: [{ property: "angle", from: 0, to: v.turn, perPiece: true, order: "diagonally" }] };
+        const corner = v.around === "its corner";
+        return { shape: { kind: "bar", color: c.ink, width: 0.25, height: 0.5, align: corner ? "bottom left" : "center" }, layout: { kind: "grid", columns: 6, rows: 6, margin: 0.4 },
+          changes: [{ property: "angle", from: 0, to: v.turn, order: "diagonally", pivot: corner ? "roll" : "center" }] }; } },
+    { id: "color", title: "Color",
+      text: "A change can step through a palette. This is Le Parc's scale of fourteen colors.",
+      code: (v) => ({ palette: raw(`FOURTEEN.slice(0, ${v.steps})`), changes: [{ property: "color", to: v.steps - 1 }] }),
+      controls: [["steps", "Colors", 2, 14, 1, 14]],
+      sequence: (v, c) => ({ shape: { kind: "circle", width: 0.75 }, layout: { kind: "grid", columns: 14, rows: 6, margin: 0.4 }, palette: FOURTEEN.slice(0, v.steps),
+        changes: [{ property: "color", from: 0, to: v.steps - 1, order: "diagonally" }] }) },
+    { id: "rules", title: "Rules",
+      text: "When no setting does it, write a <code>rule</code>: a formula of where a cell sits and how much time has passed.",
+      code: (v, st) => ({ changes: [{ property: "angle", rule: st.changes[0].rule }] }),
+      controls: [["formula", "Formula", ["column × row", "distance from center", "column + row", "waves"]], ["k", "Strength", 2, 30, 1, 12]],
+      sequence: (v, c) => {
+        const src = { "column × row": `({ x, y, time }) => ${v.k} * x * y + 180 * time`, "distance from center": `({ x, y, time }) => ${v.k * 4} * Math.hypot(x, y) + 180 * time`,
+          "column + row": `({ x, y, time }) => ${v.k * 2} * (x + y) + 180 * time`, "waves": `({ x, y, time }) => ${v.k * 4} * Math.sin(x * y / 8 + 3 * time)` }[v.formula];
+        return { shape: { kind: "cross", color: c.ink, width: 0.8, height: 0.07 }, layout: { kind: "grid", columns: 12, rows: 12, margin: 0.4 },
+          changes: [{ property: "angle", rule: ruleOf(src) }] }; } },
+    { id: "playing", title: "Playing",
+      text: "<code>play</code> runs a sequence in an element. <code>time.enter</code> builds it in first, cell by cell.",
+      code: (v) => `${snippet({ time: { enter: v.enter, duration: v.cycle } })}\n\nplay(sequence, element);`,
+      controls: [["enter", "Entrance", 0, 4, 0.5, 2], ["cycle", "Duration", 1, 8, 0.5, 3]],
+      time: (v) => ({ enter: v.enter, duration: v.cycle }),
+      sequence: (v, c) => ({ shape: { kind: "cross", colors: [c.ink, c.accent], width: 0.8, height: 0.08 }, layout: { kind: "grid", columns: 9, rows: 9, margin: 0.4 },
+        changes: [{ property: "angle", from: 0, to: 180, order: "diagonally", pattern: "there and back" }] }) },
+    { id: "taps", title: "Taps",
+      text: "<code>cellAt</code> finds the cell under a click. <code>order: { from }</code> sends a change out from there. Tap the grid.",
+      code: (v) => `cellAt(sequence, point);\n// { column: ${tapFrom[0]}, row: ${tapFrom[1]} }\n\n${snippet({ changes: [{ property: "angle", to: v.turn, order: { from: tapFrom } }] })}`,
+      controls: [["turn", "Turn", 45, 360, 15, 180]],
+      time: () => ({ enter: TAP_ENTER }),
+      sequence: (v, c) => ({ shape: { kind: "split-square", colors: [c.ink, c.accent], width: 0.62 }, layout: { kind: "grid", columns: 9, rows: 9, margin: 0.4 },
+        changes: [{ property: "angle", from: 0, to: v.turn, order: { from: tapFrom } }] }) },
+    { id: "wobble", title: "Wobble",
+      text: "<code>wobble</code> shakes every edge a little, like a hand-cut shape. Same <code>seed</code>, same wobble.",
+      code: (v) => ({ wobble: v.wobble }),
+      controls: [["wobble", "Wobble", 0, 1.5, 0.05, 0.6]],
+      sequence: (v, c) => ({ shape: { kind: "cut-circle", color: c.ink, width: 0.82, amount: 0.78 }, layout: { kind: "grid", columns: 6, rows: 6, margin: 0.4 }, wobble: v.wobble, seed: 3,
+        changes: [{ property: "angle", from: 0, to: 315, order: "diagonally" }] }) },
+  ];
+  // taps: the cell last tapped, and how long the change takes to spread from it
+  let tapFrom = [4, 4];
+  const TAP_ENTER = 1.6;
+
+  // ---- build the page from the sections ----
+  const range = ([id, label, min, max, step, value], sid) =>
+    `<label class="control-label">${label}<div class="range-wrap" style="--val:${(value - min) / (max - min)}"><input type="range" data-s="${sid}" data-k="${id}" min="${min}" max="${max}" step="${step}" value="${value}"><span class="range-thumb"></span><span class="range-cap-left"></span><span class="range-cap-right"></span></div><span class="control-value" data-v="${sid}.${id}">${value}</span></label>`;
+  const select = ([id, label, opts], sid) => `<label class="control-label">${label}<select class="control-select" data-s="${sid}" data-k="${id}">${opts.map((o) => `<option>${o}</option>`).join("")}</select></label>`;
+  const values = {};
+  $("sections").innerHTML = SECTIONS.map((s) => {
+    values[s.id] = Object.fromEntries(s.controls.map((c) => [c[0], Array.isArray(c[2]) ? c[2][0] : c[5]]));
+    return `<div class="section-row" id="${s.id}">
+      <div class="section-demo"><div class="demo"><div class="demo-canvas ${s.canvas ?? ""}" id="demo-${s.id}"></div>
+        <div class="demo-controls">${s.controls.map((c) => (Array.isArray(c[2]) ? select(c, s.id) : range(c, s.id))).join("")}</div></div></div>
+      <div class="section-text"><h2>${s.title}</h2><p>${s.text}</p><pre><code id="code-${s.id}"></code></pre></div>
+    </div>`;
+  }).join("");
+  // ---- draw your own: a pad under the Shapes demo, shown when "draw your own" is picked ----
+  const pad = document.createElement("div");
+  pad.className = "draw-pad"; pad.hidden = true;
+  pad.innerHTML = `<svg viewBox="-0.6 -0.6 1.2 1.2"></svg><button type="button">Clear</button>`;
+  document.querySelector("#shapes .demo-controls").append(pad);
+  const padSvg = pad.querySelector("svg");
+  const padDraw = () => {
+    const pts = drawn.map((p) => p.join(",")).join(" ");
+    padSvg.innerHTML = `<rect x="-0.5" y="-0.5" width="1" height="1" class="pad-cell"/>` + (drawn.length > 2 ? `<polygon points="${pts}" class="pad-shape"/>` : `<polyline points="${pts}" class="pad-line"/>`) +
+      drawn.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="0.035" class="pad-corner"/>`).join("");
+  };
+  const padRedraw = () => { padDraw(); if (drawn.length > 2) { $("demo-shapes").innerHTML = ""; draw(); } };
+  const padPoint = (e) => { const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(padSvg.getScreenCTM().inverse()); return [Math.round(Math.max(-0.5, Math.min(0.5, p.x)) * 100) / 100, Math.round(Math.max(-0.5, Math.min(0.5, p.y)) * 100) / 100]; };
+  const nearest = ([x, y]) => drawn.findIndex(([a, b]) => Math.hypot(a - x, b - y) < 0.06);
+  let dragging = -1;
+  padSvg.addEventListener("pointerdown", (e) => {
+    const p = padPoint(e);
+    dragging = nearest(p);
+    if (dragging < 0) {
+      // a new corner goes into the edge it's closest to, so the outline doesn't cross itself
+      let best = drawn.length, dist = Infinity;
+      drawn.forEach((a, i) => {
+        const b = drawn[(i + 1) % drawn.length], [dx, dy] = [b[0] - a[0], b[1] - a[1]];
+        const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / (dx * dx + dy * dy || 1)));
+        const d = Math.hypot(a[0] + t * dx - p[0], a[1] + t * dy - p[1]);
+        if (d < dist) { dist = d; best = i + 1; }
+      });
+      drawn.splice(best, 0, p); dragging = best;
+    }
+    padSvg.setPointerCapture(e.pointerId); padRedraw();
+  });
+  padSvg.addEventListener("pointermove", (e) => { if (dragging < 0) return; drawn[dragging] = padPoint(e); padRedraw(); });
+  padSvg.addEventListener("pointerup", () => { dragging = -1; });
+  padSvg.addEventListener("dblclick", (e) => { const i = nearest(padPoint(e)); if (i >= 0 && drawn.length > 3) { drawn.splice(i, 1); padRedraw(); } });
+  pad.querySelector("button").onclick = () => { drawn = []; padDraw(); };
+  const padShow = () => { pad.hidden = values.shapes.kind !== "draw your own"; if (!pad.hidden) padDraw(); };
+
+  // ---- playing: the sequence's own player, with an entrance; taps: a change sent out from the cell tapped ----
+  const playButton = Object.assign(document.createElement("button"), { type: "button", className: "section-button", textContent: "Play" });
+  const resetButton = Object.assign(document.createElement("button"), { type: "button", className: "section-button", textContent: "Reset" });
+  document.querySelector("#playing .demo-controls").append(playButton, resetButton);
+  const stopSection = (id) => { players[id]?.stop(); players[id] = null; };
+  playButton.onclick = () => {
+    if (players.playing) { stopSection("playing"); playButton.textContent = "Play"; return; }
+    runSection("playing", { from: 0 }); playButton.textContent = "Pause";
+  };
+  resetButton.onclick = () => { stopSection("playing"); playButton.textContent = "Play"; $("demo-playing").innerHTML = ""; draw(); };
+  $("demo-taps").addEventListener("click", (e) => {
+    const svg = $("demo-taps").querySelector("svg"), p = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse());
+    const cell = cellAt(sectionSequence(SECTIONS.find((x) => x.id === "taps"), settings()), [p.x, p.y], { padding: 20 });
+    if (!cell) return;
+    tapFrom = [cell.column, cell.row];
+    $("code-taps").innerHTML = highlight(SECTIONS.find((x) => x.id === "taps").code(values.taps));
+    runSection("taps", { from: 0, until: TAP_ENTER, onEnd: draw });
+  });
+
+  const measureCode = () => {
+    const pre = document.querySelector(".section-text pre"), probe = document.createElement("span");
+    probe.textContent = "0".repeat(20); pre.firstChild.append(probe);
+    const cs = getComputedStyle(pre), room = pre.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    WIDTH = Math.max(28, Math.floor(room / (probe.getBoundingClientRect().width / 20)) - 1); probe.remove();
+  };
+  $("toc").innerHTML = [...SECTIONS.map((s) => [s.id, s.title]), ["combined", "Putting it all together"], ["sequences", "Sequences"], ["after", "After Le Parc"]]
+    .map(([id, t]) => `<li><a href="#${id}">${t}</a></li>`).join("");
+
+  // ---- settings: one panel, every sequence ----
+  let at = 0, playing = false, last = 0;
+  // the panel is the camera: everything in it acts on every sequence, still or playing
+  const settings = () => ({
+    time: { duration: Number($("set-duration").value), stagger: Number($("set-stagger").value), repeat: $("set-repeat").value, easing: $("set-easing").value },
+    density: Number($("set-density").value), colors: PALETTES[$("set-palette").value], wobble: Number($("set-wobble").value),
+    gridLines: $("set-gridlines").checked, cards: $("set-cards").checked, stroke: Number($("set-stroke").value),
+  });
+
+  // a section's code: only the settings it's about, laid out like hand-written code. An object stays on
+  // one line when it fits the column, otherwise each setting gets its own line.
+  let WIDTH = 32; // characters that fit in the code column; measured once the page is built
+  const raw = (text) => ({ raw: text });
+  // `lead`: how much is already on the line before this value (its key, say)
+  const fmt = (v, ind = "", lead = 0) => {
+    if (v?.raw) return v.raw;
+    const fits = (text) => !text.includes("\n") && ind.length + lead + text.length <= WIDTH;
+    if (typeof v === "function") { const f = String(v).replace(/\s+/g, " "); return fits(f) ? f : f.replace(" => ", ` =>\n${ind}  `); }
+    if (typeof v !== "object" || v === null) return typeof v === "string" ? JSON.stringify(v) : String(v);
+    if (Array.isArray(v) && v.length === 1 && typeof v[0] === "object" && !Array.isArray(v[0])) return `[${fmt(v[0], ind, lead + 1)}]`;
+    const inner = ind + "  ";
+    const items = Array.isArray(v) ? v.map((x) => fmt(x, inner)) : Object.entries(v).filter(([, x]) => x !== undefined).map(([k, x]) => `${k}: ${fmt(x, inner, k.length + 2)}`);
+    const [open, close] = Array.isArray(v) ? ["[", "]"] : ["{ ", " }"];
+    const one = open + items.join(", ") + close;
+    if (fits(one)) return one;
+    // too long for one line: as many settings per line as fit, the way you'd write it by hand
+    const rows = [];
+    for (const item of items) {
+      const last = rows[rows.length - 1];
+      if (last && !item.includes("\n") && !last.includes("\n") && inner.length + last.length + 2 + item.length <= WIDTH) rows[rows.length - 1] = `${last}, ${item}`;
+      else rows.push(item);
+    }
+    return `${open.trim()}\n${rows.map((r) => inner + r).join(",\n")}\n${ind}${close.trim()}`;
+  };
+  const snippet = (parts, ind = "") => Object.entries(parts).map(([k, x]) => `${ind}${k}: ${fmt(x, ind, k.length + 2)}`).join(",\n");
+  const call = (name, parts) => `${name}({\n${snippet(parts, "  ")}\n})`;
+  // a section's code: only the part it's about, colored simply
+  const highlight = (src) => esc(src).replace(/("[^"]*")|\b([a-zA-Z]+)(?=: )|(-?\b\d+\.?\d*\b)/g,
+    (m, str, key, num) => (str ? `<span class="s">${str}</span>` : key ? `<span class="k">${key}</span>` : `<span class="n">${num}</span>`));
+  const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+  // ---- hero: a field that fills the screen and builds itself; tap for another, built out from there ----
+  const ENTER = 2.4; // seconds for the field to build
+  let heroSeed = 0, heroFrom = null, heroPlayer = null;
+  const HEROES = [
+    (c, cols, rows, from) => ({ shape: { kind: "split-square", colors: [c.ink, c.accent], width: 0.6, gap: 0.06 }, layout: { kind: "grid", columns: cols, rows, margin: 0 },
+      changes: [{ property: "angle", from: 0, to: 180, order: from ?? "in rings", easing: "ease in out, sine" }, { property: "amount", from: 0.18, to: 0.82, order: from ?? "in rings" }] }),
+    (c, cols, rows, from) => ({ shape: { kind: "cross", colors: [c.ink, c.accent], width: 0.85, height: 0.08 }, layout: { kind: "grid", columns: cols, rows, margin: 0 },
+      changes: [{ property: "angle", from: 0, to: 180, order: from ?? "diagonally", pattern: "there and back", easing: "ease in out, sine" }] }),
+    (c, cols, rows, from) => ({ shape: { kind: "cut-circle", color: c.ink, width: 0.82, amount: 0.76 }, layout: { kind: "grid", columns: cols, rows, margin: 0 },
+      changes: [{ property: "angle", from: 0, to: 360, order: from ?? "from center", pattern: "loop", repeat: 2 }] }),
+    (c, cols, rows, from) => ({ shape: woven(c), layout: { kind: "grid", columns: cols, rows, margin: 0 },
+      changes: [{ property: "width", piece: 0, from: 0.04, to: 0.5, order: from ?? "left to right", pattern: "there and back" },
+        { property: "height", piece: 1, from: 0.04, to: 0.5, order: from ?? "top to bottom", pattern: "there and back" }] }),
+    (c, cols, rows, from) => ({ shape: { kind: "count", color: c.ink, width: 0.86, count: 4 }, layout: { kind: "grid", columns: cols, rows, margin: 0 },
+      changes: [{ property: "amount", from: 0, to: 1, order: from ?? "from center", pattern: "there and back" }] }),
+  ];
+  const heroSequence = (s) => {
+    const rows = Math.max(3, Math.round(11 * s.density)), cols = Math.max(rows, Math.round(rows * innerWidth / innerHeight));
+    const sequence = finish(HEROES[heroSeed % HEROES.length](s.colors, cols, rows, heroFrom), { ...s, density: 1 });
+    return { ...sequence, time: { ...sequence.time, enter: ENTER } };
+  };
+  // while the field is building, its own player draws it; afterwards it follows the page's clock
+  // hover: a spot under the pointer whose cells run ahead in time, most at its center, none beyond its edge.
+  // It follows the pointer and fades in and out, gliding rather than jumping. The hero and the mix share it.
+  const LENS = 2.5, LIFT = 0.5; // radius in cells; how far ahead, in cycles
+  const spot = (redraw, busy = () => false) => {
+    const lens = { c: 0, r: 0, goalC: 0, goalR: 0, on: 0, goalOn: 0 };
+    let chasing = false;
+    const chase = () => {
+      if (chasing) return;
+      chasing = true;
+      let last = performance.now();
+      const step = (now) => {
+        if (busy()) { chasing = false; return; }
+        // close the same share of the distance every 90 ms, however fast the screen draws
+        const k = 1 - Math.exp(-(now - last) / 90); last = now;
+        for (const [key, goal] of [["c", "goalC"], ["r", "goalR"], ["on", "goalOn"]]) lens[key] += (lens[goal] - lens[key]) * k;
+        const done = Math.abs(lens.goalC - lens.c) + Math.abs(lens.goalR - lens.r) + Math.abs(lens.goalOn - lens.on) < 0.003;
+        if (done) { lens.c = lens.goalC; lens.r = lens.goalR; lens.on = lens.goalOn; }
+        if (!playing) redraw();
+        if (done) chasing = false; else requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+    return {
+      // the time for each cell: `base` everywhere, more inside the spot
+      time: (base, duration) => {
+        const ahead = LIFT * duration * lens.on;
+        return ahead < 1e-3 ? base : ({ column, row }) => base + ahead * Math.max(0, 1 - ((column - lens.c) ** 2 + (row - lens.r) ** 2) / LENS ** 2) ** 2;
+      },
+      // `cell` from cellAt, or null when the pointer leaves
+      follow: (cell) => {
+        if (!cell) { lens.goalOn = 0; return chase(); }
+        if (!lens.on && !lens.goalOn) { lens.c = cell.x; lens.r = cell.y; } // appear where the pointer is, don't slide in from the corner
+        Object.assign(lens, { goalC: cell.x, goalR: cell.y, goalOn: 1 }); chase();
+      },
+      reset: () => { lens.on = lens.goalOn = 0; },
+    };
+  };
+  const mixSpot = spot(() => drawMix(settings()));
+  const drawMix = (s) => { const mix = comboFor(s.colors); render(finish(mix, s), $("demo-combined"), { time: mixSpot.time(at, s.time.duration), padding: 10 }); return mix; };
+  const heroSpot = spot(() => drawHero(settings()), () => heroPlayer);
+  const drawHero = (s) => { if (!heroPlayer) render(heroSequence(s), $("hero"), { time: heroSpot.time(at + ENTER, s.time.duration), padding: 0, fit: "cover" }); };
+  const buildHero = () => {
+    heroPlayer?.stop(); heroSpot.reset();
+    heroPlayer = play(() => heroSequence(settings()), $("hero"), { from: 0, until: ENTER, padding: 0, fit: "cover", onEnd: () => { heroPlayer = null; } });
+  };
+
+  // ---- putting it all together: a random sequence from the parts above ----
+  let comboSeed = 7;
+  const rand = (n) => { comboSeed = (comboSeed * 16807) % 2147483647; return comboSeed % n; };
+  // a sequence drawn at random from everything the engine does: any shape (split, drawn, woven, counted),
+  // a grid, tall cells or a ring, a turn sent in some direction, a second change that suits the shape,
+  // and now and then a mirror or a layer on top
+  const combo = (c) => {
+    const pick = (list) => list[rand(list.length)];
+    const shapes = [
+      [{ kind: "triangle", color: c.ink, width: 0.7 }, "size"],
+      [{ kind: pick(["circle", "square", "diamond", "triangle"]), colors: [c.ink, c.accent], width: 0.75, split: 0.5, gap: 0.05 }, "split"],
+      [{ kind: "polygon", sides: 3 + rand(5), color: c.ink, width: 0.72 }, "size"],
+      [{ kind: "crescent", color: c.ink, width: 0.75 }, "amount"],
+      [{ kind: "ring", color: c.ink, width: 0.75 }, "amount"],
+      [{ kind: "outline", color: c.ink, width: 0.75, points: pick(Object.values(OUTLINES)) }, "size"],
+      [woven(c), "weave"],
+      [{ kind: "count", color: c.ink, width: 0.86, count: 4 }, "amount"],
+      [{ kind: "segments", colors: [c.ink, c.accent, c.second], width: 0.6, count: 2 + rand(3) }, "spread"],
+      [{ kind: "cut-circle", color: c.ink, width: 0.8 }, "amount"],
+      [{ kind: "cross", colors: [c.ink, c.accent], width: 0.8, height: 0.07 }, "size"],
+    ];
+    const [shape, second] = pick(shapes);
+    const cols = 8 + rand(9), rows = 5 + rand(5);
+    const where = rand(10), layout = where < 2 ? { kind: "ring", count: 12 + rand(17), facing: rand(2) === 1, margin: 0.3 }
+      : where < 3 ? { kind: "grid", columns: cols + 6, rows: Math.max(2, rows - 3), aspect: 2, margin: 0.3 } : { kind: "grid", columns: cols, rows, margin: 0.3 };
+    const n = layout.kind === "ring" ? layout.count : layout.columns;
+    const anyOrder = () => (rand(5) === 0 ? { from: [rand(n), layout.kind === "ring" ? 0 : rand(layout.rows)] } : pick(["in rings", "from center", "diagonally", "from middle column", "checkerboard", "left to right", "random"]));
+    const changes = [{ property: "angle", to: pick([90, 180, 360]), order: anyOrder(), pattern: pick(["one way", "there and back", "loop"]), easing: pick(["linear", "ease in out, sine", "ease out"]) }];
+    if (second === "weave") changes.push({ property: "width", piece: 0, from: 0.04, to: 0.5, order: "left to right" }, { property: "height", piece: 1, from: 0.04, to: 0.5, order: "top to bottom" });
+    else changes.push({ property: second, from: second === "spread" ? 0 : 0.2, to: second === "spread" ? 0.2 : second === "size" ? 1 : 0.85, order: anyOrder(), pattern: "there and back" });
+    if (rand(4) === 0) changes.push({ property: "mirror", from: 0, to: 1, order: "checkerboard" });
+    const sequence = { shape, layout, changes };
+    if (layout.kind === "grid" && rand(5) === 0) sequence.layers = [{ shape: { kind: "cross", color: c.accent, width: 0.9, height: 0.05 }, layout: { kind: "grid", columns: cols + 3, rows: rows + 2, margin: 0.3 }, changes: [{ property: "angle", to: 90, order: "from center" }] }];
+    return sequence;
+  };
+  // its code, without colors and long point lists, so it reads like something you'd write
+  const comboCode = (st) => {
+    const { color, colors, points, pieces, ...shape } = st.shape;
+    return { shape: { ...shape, ...(points ? { points: [points[0], raw("…")] } : {}), ...(pieces ? { pieces: raw("[upright, flat]") } : {}) },
+      layout: st.layout, changes: st.changes, ...(st.layers ? { layers: raw("[{ shape: { kind: \"cross\" }, … }]") } : {}) };
+  };
+  // the composition is remembered by its seed, so it's rebuilt in the panel's current colors every time
+  let comboKey = 7;
+  const comboFor = (c) => { comboSeed = comboKey; return combo(c); };
+
+  // each tile keeps its own clock: it runs while hovered, and a tap sends a wave of time out from the cell tapped
+  const tiles = SEQUENCES.map(() => ({ t: 0, on: false, ripples: [] }));
+  const WAVE = { speed: 9, width: 1.6, lift: 0.3, life: 2.4 }; // cells a second, cells, cycles, seconds
+  const tileAt = (i, s) => {
+    const tile = tiles[i], base = at + tile.t, now = performance.now() / 1000;
+    if (!tile.ripples.length) return base;
+    return ({ column, row, columns }) => base + tile.ripples.reduce((sum, w) => {
+      const age = now - w.start, dc = Math.abs(column - w.c), d = Math.hypot(w.ring ? Math.min(dc, columns - dc) : dc, row - w.r);
+      return sum + WAVE.lift * s.time.duration * (1 - age / WAVE.life) * Math.exp(-(((d - age * WAVE.speed) / WAVE.width) ** 2));
+    }, 0);
+  };
+  const drawTile = (i, s) => render(finish(SEQUENCES[i].sequence(s.colors), s), $(`tile-${i}`), { time: tileAt(i, s), padding: 10 });
+  let tilesRunning = false;
+  const runTiles = () => {
+    if (tilesRunning) return;
+    tilesRunning = true;
+    let last = performance.now();
+    const step = (now) => {
+      const dt = (now - last) / 1000, s = settings(); last = now;
+      let busy = false;
+      tiles.forEach((tile, i) => {
+        tile.ripples = tile.ripples.filter((w) => now / 1000 - w.start < WAVE.life);
+        if (tile.on) tile.t += dt;
+        if (tile.on || tile.ripples.length || tile.fresh) { if (!playing) drawTile(i, s); busy = busy || tile.on || tile.ripples.length > 0; }
+        tile.fresh = tile.ripples.length > 0; // one more frame once a ripple ends, so it settles exactly
+      });
+      if (busy) requestAnimationFrame(step); else tilesRunning = false;
+    };
+    requestAnimationFrame(step);
+  };
+
+  // ---- draw only what's on screen ----
+  const visible = new Set();
+  // a section's sequence, finished by the panel; a section can add its own timing on top
+  const sectionSequence = (sec, s) => { const st = finish(sec.sequence(values[sec.id], s.colors), s); return sec.time ? { ...st, time: { ...st.time, ...sec.time(values[sec.id]) } } : st; };
+  const players = {};
+  const runSection = (id, opts) => {
+    players[id]?.stop();
+    const sec = SECTIONS.find((x) => x.id === id);
+    players[id] = play(() => sectionSequence(sec, settings()), $(`demo-${id}`), { padding: 20, ...opts, onEnd: () => { players[id] = null; opts.onEnd?.(); } });
+  };
+  const draw = () => {
+    const s = settings();
+    if (visible.has("hero") || !$("hero").innerHTML) drawHero(s);
+    for (const sec of SECTIONS) {
+      const el = $(`demo-${sec.id}`);
+      if (!visible.has(el.id) && el.innerHTML) continue;
+      if (players[sec.id]) continue; // its own player is drawing it
+      const sequence = sectionSequence(sec, s);
+      // a sequence with an entrance shows the picture it builds to
+      const t = sec.id === "time" && values.time.scrub > 0 && !playing ? values.time.scrub * s.time.duration : at + (sequence.time.enter ?? 0);
+      if (sec.canvas === "stack") {
+        const one = toSVG({ ...sequence, layout: { ...sequence.layout, count: 1 } }, { time: t, padding: 10 });
+        el.innerHTML = `<div class="one">${one}</div><div class="stack-label">one cell, playing</div>${toSVG(sequence, { time: t, padding: 20 })}<div class="stack-label">eleven cells, each a step ahead of the last</div>`;
+      } else render(sequence, el, { time: t, padding: 20 });
+      const code = sec.code(values[sec.id], finish(sec.sequence(values[sec.id], PALETTES.Page), s));
+      $(`code-${sec.id}`).innerHTML = highlight(typeof code === "string" ? code : snippet(code));
+    }
+    if (visible.has("demo-combined") || !$("demo-combined").innerHTML) {
+      const mix = drawMix(s);
+      // this code block is full width, so its lines can be longer
+      const narrow = WIDTH; WIDTH = 78;
+      $("code-combined").innerHTML = highlight(snippet(comboCode(mix)));
+      WIDTH = narrow;
+    }
+    SEQUENCES.forEach((_, i) => { if (visible.has(`tile-${i}`) || !$(`tile-${i}`).innerHTML) drawTile(i, s); });
+    for (const el of document.querySelectorAll("#gallery .demo-canvas")) {
+      if (!visible.has(el.id) && el.innerHTML) continue;
+      const w = learning[Number(el.dataset.i)];
+      // the recreations keep Le Parc's own colors; time comes from the panel
+      const time = w.sequence.time ? { ...w.sequence.time, stagger: s.time.stagger, duration: s.time.duration } : undefined;
+      render({ ...w.sequence, time }, el, { time: time ? at : 0, padding: 10 });
+    }
+  };
+  const io = new IntersectionObserver((es) => { for (const e of es) e.isIntersecting ? visible.add(e.target.id) : visible.delete(e.target.id); draw(); }, { rootMargin: "200px" });
+
+  // ---- After Le Parc gallery ----
+  const MET = { "Sequence of Translational Motion": 815061, "Progression": 815062, "Nine Sequences of Translational Motion": 815302, "Three Segments in Translational Motion": 815309,
+    "Segmented in Rotation": 815299, "Metamorphosis of a Line": 815298, "Translational Rotation": 815332, "Rotation in Red and Black": 815338, "Rotation of Fractioned Circles": 815341,
+    "Mutation of Forms": 815337, "Quantitative Sequences": 815381, "Tribute": 815351, "Rotations": 815346, "Fourteen Colors – Sequence": 815316,
+    "Seven Sequences of the Movement of the Translational Motion of Red and Blue Segments": 815060 };
+  // the row works are long strips, like the framed originals: full width, first; the grids follow in squares
+  const order = learning.map((w, i) => i).sort((a, b) => (learning[a].sequence.layout.kind === "row" ? 0 : 1) - (learning[b].sequence.layout.kind === "row" ? 0 : 1));
+  $("gallery").innerHTML = order.map((i) => [learning[i], i]).map(([w, i]) => `<div class="demo ${w.sequence.layout.kind === "row" ? "strip" : ""}"><div class="demo-canvas" id="gal-${i}" data-i="${i}"></div>
+    <div class="gallery-caption"><strong>${w.title.startsWith("Seven Sequences") ? "Seven Sequences" : w.title}</strong>${w.year}${w.test ? " · the blind test" : ""}${MET[w.title] ? ` · <a href="https://www.metmuseum.org/art/collection/search/${MET[w.title]}">at the Met</a>` : ""}</div></div>`).join("");
+
+  $("sequence-tiles").innerHTML = SEQUENCES.map((w, i) => `<div class="demo ${w.strip ? "strip" : ""}"><div class="demo-canvas tile" id="tile-${i}"></div>
+    <div class="gallery-caption"><strong>${w.title}</strong>${w.shows}</div></div>`).join("");
+  SEQUENCES.forEach((w, i) => {
+    const el = $(`tile-${i}`), tile = tiles[i];
+    el.addEventListener("pointerenter", (e) => { if (e.pointerType !== "touch") { tile.on = true; runTiles(); } });
+    el.addEventListener("pointerleave", () => { tile.on = false; });
+    el.addEventListener("click", (e) => {
+      const sequence = finish(w.sequence(settings().colors), settings()), svg = el.querySelector("svg");
+      const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse());
+      const cell = cellAt(sequence, [p.x, p.y], { padding: 10 });
+      if (!cell) return;
+      tile.ripples.push({ c: cell.column, r: cell.row, ring: sequence.layout.kind === "ring", start: performance.now() / 1000 }); runTiles();
+    });
+  });
+
+  // ---- wire it up ----
+  for (const el of [$("hero"), ...document.querySelectorAll(".demo-canvas"), $("demo-combined")]) io.observe(el);
+  // sliders and dropdowns fire "input" while moving and "change" when let go; both go through here,
+  // and a slider's value is always stored as a number
+  const onControl = (e) => {
+    const t = e.target;
+    if (t.type === "range") t.parentElement.style.setProperty("--val", (t.value - t.min) / (t.max - t.min));
+    if (t.dataset.s) {
+      values[t.dataset.s][t.dataset.k] = t.type === "range" ? Number(t.value) : t.value;
+      if (t.type === "range") document.querySelector(`[data-v="${t.dataset.s}.${t.dataset.k}"]`).textContent = t.value;
+      $(`demo-${t.dataset.s}`).innerHTML = "";
+    }
+    if (t.id === "set-progress") at = Number(t.value) * settings().time.duration;
+    if (t.dataset.s === "shapes") padShow();
+    labels(); draw();
+  };
+  document.addEventListener("input", onControl);
+  document.addEventListener("change", onControl);
+  const labels = () => {
+    $("v-progress").textContent = $("set-progress").value; $("v-stagger").textContent = $("set-stagger").value; $("v-duration").textContent = `${$("set-duration").value}s`;
+    $("v-density").textContent = `×${$("set-density").value}`; $("v-wobble").textContent = $("set-wobble").value;
+    $("v-stroke").textContent = Number($("set-stroke").value) ? $("set-stroke").value : "solid";
+    for (const r of document.querySelectorAll(".settings-panel input[type=range]")) r.parentElement.style.setProperty("--val", (r.value - r.min) / (r.max - r.min));
+  };
+  // while playing, the progress slider follows the clock (there and back when the cycle comes back)
+  const showProgress = () => {
+    const c = at / settings().time.duration, m = $("set-repeat").value === "loop" ? c % 1 : 1 - Math.abs((c % 2) - 1);
+    $("set-progress").value = String(Math.round(m * 100) / 100); labels();
+  };
+
+  const tick = (now) => { if (!playing) return; at += (now - last) / 1000; last = now; showProgress(); draw(); requestAnimationFrame(tick); };
+  const setPlaying = (on) => { if (on) { heroPlayer?.stop(); heroPlayer = null; } playing = on; $("play").textContent = on ? "Pause" : "Play"; if (on) { last = performance.now(); requestAnimationFrame(tick); } };
+  $("play").onclick = () => setPlaying(!playing);
+  addEventListener("keydown", (e) => { if (e.code === "Space" && !["INPUT", "SELECT", "BUTTON"].includes(e.target.tagName)) { e.preventDefault(); setPlaying(!playing); } });
+
+  // the hero: the cells under the pointer run ahead; tap for another field, built out from the cell you tapped
+  const heroPoint = (e) => { const svg = $("hero").querySelector("svg"); const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse()); return [p.x, p.y]; };
+  $("hero").addEventListener("pointermove", (e) => {
+    if (heroPlayer || e.pointerType === "touch") return;
+    const cell = cellAt(heroSequence(settings()), heroPoint(e), { padding: 0 });
+    if (cell) heroSpot.follow(cell);
+  });
+  $("hero").addEventListener("pointerleave", () => heroSpot.follow(null));
+  $("hero").addEventListener("click", (e) => {
+    const cell = cellAt(heroSequence(settings()), heroPoint(e), { padding: 0 });
+    heroSeed++; heroFrom = cell ? { from: [cell.column, cell.row] } : null;
+    if (playing) setPlaying(false);
+    buildHero();
+  });
+  $("demo-combined").addEventListener("click", () => { comboFor(settings().colors); comboKey = comboSeed; mixSpot.reset(); $("demo-combined").innerHTML = ""; draw(); });
+  // hover the mix: the same spot as the hero
+  const mixPoint = (e) => { const svg = $("demo-combined").querySelector("svg"); const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse()); return [p.x, p.y]; };
+  $("demo-combined").addEventListener("pointermove", (e) => {
+    if (e.pointerType === "touch") return;
+    const cell = cellAt(finish(comboFor(settings().colors), settings()), mixPoint(e), { padding: 10 });
+    mixSpot.follow(cell);
+  });
+  $("demo-combined").addEventListener("pointerleave", () => mixSpot.follow(null));
+
+  // the settings panel fades in once the hero is mostly out of view; on a phone it starts folded, so it doesn't cover the page
+  if (matchMedia("(max-width: 56rem)").matches) $("settings").open = false;
+  new IntersectionObserver(([e]) => $("settings").classList.toggle("visible", e.intersectionRatio < 0.4), { threshold: [0, 0.2, 0.4, 0.6, 1] }).observe($("hero"));
+
+  // randomize buttons
+  const pick = (sel) => { sel.selectedIndex = Math.floor(Math.random() * sel.options.length); };
+  const roll = (input, min, max, step) => { input.value = String(Math.round((min + Math.random() * (max - min)) / step) * step); input.parentElement.style.setProperty("--val", (input.value - input.min) / (input.max - input.min)); };
+  const redraw = () => { labels(); for (const el of document.querySelectorAll(".demo-canvas")) el.innerHTML = ""; draw(); };
+  $("rand-progress").onclick = () => { roll($("set-progress"), 0, 1, 0.01); roll($("set-stagger"), 0, 2, 0.05); at = Number($("set-progress").value) * settings().time.duration; redraw(); };
+  $("rand-density").onclick = () => { roll($("set-density"), 0.5, 2, 0.25); redraw(); };
+  $("rand-color").onclick = () => { pick($("set-palette")); redraw(); };
+  $("rand-finish").onclick = () => { roll($("set-wobble"), 0, 1, 0.05); $("set-gridlines").checked = Math.random() < 0.5; $("set-cards").checked = Math.random() < 0.5; redraw(); };
+  $("rand-stroke").onclick = () => { roll($("set-stroke"), 0.005, 0.06, 0.005); redraw(); };
+  // back to the paintings: every setting to its default, paused at the start
+  $("reset").onclick = () => {
+    setPlaying(false); at = 0;
+    for (const el of document.querySelectorAll(".settings-panel input, .settings-panel select")) {
+      if (el.type === "checkbox") el.checked = el.defaultChecked;
+      else if (el.tagName === "SELECT") el.selectedIndex = 0;
+      else el.value = el.defaultValue;
+    }
+    redraw();
+  };
+
+  addEventListener("resize", () => { measureCode(); draw(); });
+  measureCode(); labels(); draw(); buildHero();
+  // sections are built here, after load, so jump to a linked section ourselves
+  if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
+  window.parcShowcase = { setAt: (s) => { at = s; draw(); }, play: setPlaying, visible, sequences: SEQUENCES, sheet: (i, t) => toSVG(finish(SEQUENCES[i].sequence(settings().colors), settings()), { time: t, padding: 10 }), // for checking frames
+    heroAt: (t) => { heroPlayer?.stop(); heroPlayer = null; render(heroSequence(settings()), $("hero"), { time: t, padding: 0, fit: "cover" }); } };
+</script>
+</body>
+</html>
