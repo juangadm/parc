@@ -44,7 +44,7 @@
   <div class="settings-fields">
     <label class="control-label">Stroke<div class="range-wrap"><input type="range" id="set-stroke" min="0" max="0.06" step="0.005" value="0"><span class="range-thumb"></span><span class="range-cap-left"></span><span class="range-cap-right"></span></div><span class="control-value" id="v-stroke">solid</span></label>
   </div>
-  <button class="reset-button" id="reset">Back to the paintings</button>
+  <button class="reset-button" id="reset">Reset</button>
 </details>
 
 <article>
@@ -69,19 +69,29 @@
     <p>Eight pictures made only with parc. Hover one to play it. Tap to send a ripple.</p></div>
   <div class="gallery" id="sequence-tiles"></div>
 
-  <div class="section-full" id="after"><h2>After Le Parc</h2>
-    <p>Fifteen of Le Parc's studies from 1958 and 1959, rebuilt with parc from the Met's photographs. Fourteen taught the engine something. The last, Rotations, was the test: built with the engine as it was.</p></div>
-  <div class="gallery" id="gallery"></div>
+  <div class="section-full" id="credits"><h2>Credits</h2>
+    <p>The engine and this page are inspired by <a href="https://meodai.github.io/heerich/">heerich.js</a>, David Aerne's voxel engine.</p>
+    <p>The art is inspired by <a href="http://www.julioleparc.org/">Julio Le Parc</a>. I've loved his motion studies since I saw <a href="https://www.metmuseum.org/exhibitions/listings/2018/julio-le-parc-1959"><em>Julio Le Parc 1959</em></a> at the Met. Here are three, rebuilt in parc.</p></div>
+  <div class="credit-works">
+    <figure><div class="demo-canvas still" id="work-mutation"></div>
+      <figcaption class="gallery-caption"><strong><a href="https://www.metmuseum.org/art/collection/search/815337">Mutation of Forms</a></strong>1959</figcaption></figure>
+    <div class="credit-strips">
+      <figure><div class="demo-canvas still" id="work-translation"></div>
+        <figcaption class="gallery-caption"><strong><a href="https://www.metmuseum.org/art/collection/search/815061">Sequence of Translational Motion</a></strong>1959</figcaption></figure>
+      <figure><div class="demo-canvas still" id="work-seven"></div>
+        <figcaption class="gallery-caption"><strong><a href="https://www.metmuseum.org/art/collection/search/815060">Seven Sequences</a></strong>1959</figcaption></figure>
+    </div>
+  </div>
 
   <footer class="site-footer">
-    <p>parc, after Julio Le Parc. <a href="https://github.com/juangadm/parc">GitHub</a>. Page after <a href="https://meodai.github.io/heerich/">heerich.js</a> by David Aerne. Measured from photographs at The Metropolitan Museum of Art.</p>
+    <p>parc 0.2.0 · <a href="https://github.com/juangadm/parc">GitHub</a> · MIT license</p>
   </footer>
 </article>
 
 <script type="module">
   import { toSVG, render, cellAt, play } from "./dist/index.js";
-  import { learning } from "./studies/learning.js";
   import { FOURTEEN, PALETTES, finish, SEQUENCES } from "./studies/originals.js";
+  import { learning } from "./studies/learning.js";
 
   const $ = (id) => document.getElementById(id);
 
@@ -315,7 +325,7 @@
     const cs = getComputedStyle(pre), room = pre.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
     WIDTH = Math.max(28, Math.floor(room / (probe.getBoundingClientRect().width / 20)) - 1); probe.remove();
   };
-  $("toc").innerHTML = [...SECTIONS.map((s) => [s.id, s.title]), ["combined", "Putting it all together"], ["sequences", "Sequences"], ["after", "After Le Parc"]]
+  $("toc").innerHTML = [...SECTIONS.map((s) => [s.id, s.title]), ["combined", "Putting it all together"], ["sequences", "Sequences"], ["credits", "Credits"]]
     .map(([id, t]) => `<li><a href="#${id}">${t}</a></li>`).join("");
 
   // ---- settings: one panel, every sequence ----
@@ -538,25 +548,12 @@
       WIDTH = narrow;
     }
     SEQUENCES.forEach((_, i) => { if (visible.has(`tile-${i}`) || !$(`tile-${i}`).innerHTML) drawTile(i, s); });
-    for (const el of document.querySelectorAll("#gallery .demo-canvas")) {
-      if (!visible.has(el.id) && el.innerHTML) continue;
-      const w = learning[Number(el.dataset.i)];
-      // the recreations keep Le Parc's own colors; time comes from the panel
-      const time = w.sequence.time ? { ...w.sequence.time, stagger: s.time.stagger, duration: s.time.duration } : undefined;
-      render({ ...w.sequence, time }, el, { time: time ? at : 0, padding: 10 });
-    }
   };
   const io = new IntersectionObserver((es) => { for (const e of es) e.isIntersecting ? visible.add(e.target.id) : visible.delete(e.target.id); draw(); }, { rootMargin: "200px" });
 
-  // ---- After Le Parc gallery ----
-  const MET = { "Sequence of Translational Motion": 815061, "Progression": 815062, "Nine Sequences of Translational Motion": 815302, "Three Segments in Translational Motion": 815309,
-    "Segmented in Rotation": 815299, "Metamorphosis of a Line": 815298, "Translational Rotation": 815332, "Rotation in Red and Black": 815338, "Rotation of Fractioned Circles": 815341,
-    "Mutation of Forms": 815337, "Quantitative Sequences": 815381, "Tribute": 815351, "Rotations": 815346, "Fourteen Colors – Sequence": 815316,
-    "Seven Sequences of the Movement of the Translational Motion of Red and Blue Segments": 815060 };
-  // the row works are long strips, like the framed originals: full width, first; the grids follow in squares
-  const order = learning.map((w, i) => i).sort((a, b) => (learning[a].sequence.layout.kind === "row" ? 0 : 1) - (learning[b].sequence.layout.kind === "row" ? 0 : 1));
-  $("gallery").innerHTML = order.map((i) => [learning[i], i]).map(([w, i]) => `<div class="demo ${w.sequence.layout.kind === "row" ? "strip" : ""}"><div class="demo-canvas" id="gal-${i}" data-i="${i}"></div>
-    <div class="gallery-caption"><strong>${w.title.startsWith("Seven Sequences") ? "Seven Sequences" : w.title}</strong>${w.year}${w.test ? " · the blind test" : ""}${MET[w.title] ? ` · <a href="https://www.metmuseum.org/art/collection/search/${MET[w.title]}">at the Met</a>` : ""}</div></div>`).join("");
+  // credits: three of Le Parc's studies, as parc rebuilt them, in his own colors
+  for (const [id, title] of [["work-mutation", "Mutation of Forms"], ["work-translation", "Sequence of Translational Motion"], ["work-seven", "Seven Sequences"]])
+    render(learning.find((w) => w.title.startsWith(title)).sequence, $(id), { padding: 10 });
 
   $("sequence-tiles").innerHTML = SEQUENCES.map((w, i) => `<div class="demo ${w.strip ? "strip" : ""}"><div class="demo-canvas tile" id="tile-${i}"></div>
     <div class="gallery-caption"><strong>${w.title}</strong>${w.shows}</div></div>`).join("");
@@ -639,13 +636,13 @@
   // randomize buttons
   const pick = (sel) => { sel.selectedIndex = Math.floor(Math.random() * sel.options.length); };
   const roll = (input, min, max, step) => { input.value = String(Math.round((min + Math.random() * (max - min)) / step) * step); input.parentElement.style.setProperty("--val", (input.value - input.min) / (input.max - input.min)); };
-  const redraw = () => { labels(); for (const el of document.querySelectorAll(".demo-canvas")) el.innerHTML = ""; draw(); };
+  const redraw = () => { labels(); for (const el of document.querySelectorAll(".demo-canvas:not(.still)")) el.innerHTML = ""; draw(); };
   $("rand-progress").onclick = () => { roll($("set-progress"), 0, 1, 0.01); roll($("set-stagger"), 0, 2, 0.05); at = Number($("set-progress").value) * settings().time.duration; redraw(); };
   $("rand-density").onclick = () => { roll($("set-density"), 0.5, 2, 0.25); redraw(); };
   $("rand-color").onclick = () => { pick($("set-palette")); redraw(); };
   $("rand-finish").onclick = () => { roll($("set-wobble"), 0, 1, 0.05); $("set-gridlines").checked = Math.random() < 0.5; $("set-cards").checked = Math.random() < 0.5; redraw(); };
   $("rand-stroke").onclick = () => { roll($("set-stroke"), 0.005, 0.06, 0.005); redraw(); };
-  // back to the paintings: every setting to its default, paused at the start
+  // reset: every setting to its default, paused at the start
   $("reset").onclick = () => {
     setPlaying(false); at = 0;
     for (const el of document.querySelectorAll(".settings-panel input, .settings-panel select")) {

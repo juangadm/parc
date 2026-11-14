@@ -139,3 +139,14 @@
 .demo-controls .section-button { flex: 0 0 auto; align-self: center; border: 1px solid var(--text); background: none; color: var(--text); font: inherit; padding: 0.3rem 1rem; cursor: pointer; }
 .demo-controls .section-button:hover { background: var(--text); color: var(--bg); }
 #demo-taps { cursor: pointer; }
+/* credits: one square painting, and two strips stacked beside it, stretched to the same height */
+.credit-works { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.3fr); gap: 1.25rem; margin-top: 2.5rem; max-width: 34rem; }
+.credit-works figure { margin: 0; display: flex; flex-direction: column; }
+.credit-works > figure .demo-canvas { aspect-ratio: 1; }
+.credit-strips { display: flex; flex-direction: column; gap: 1rem; }
+.credit-strips figure { flex: 1; }
+.credit-strips .demo-canvas { flex: 1; min-height: 0; aspect-ratio: auto; }
+@media (max-width: 56rem) {
+  .credit-works { grid-template-columns: 1fr; }
+  .credit-strips .demo-canvas { flex: none; aspect-ratio: 6; }
+}
