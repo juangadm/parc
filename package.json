@@ -1,0 +1,24 @@
+{
+  "name": "parc",
+  "version": "0.2.0",
+  "description": "A small engine for sequences, rendered to SVG. After Julio Le Parc.",
+  "license": "MIT",
+  "repository": "github:juangadm/parc",
+  "homepage": "https://github.com/juangadm/parc",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc && node --test test/"
+  },
+  "devDependencies": {
+    "typescript": "5.6.3"
+  }
+}
